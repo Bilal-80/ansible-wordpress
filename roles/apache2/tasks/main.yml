@@ -1,0 +1,32 @@
+---
+- name: Install Apache2
+  apt:
+   name: apache2
+   state: present
+   update_cache: yes
+
+
+- name: Start Service
+  service:
+    name: apache2
+    state: started
+
+
+- name: Delete dir.conf
+  file:
+    path: /etc/apache2/mods-enabled/dir.conf
+    state: absent 
+
+
+- name: Write File
+  template:
+    src: dir.conf.j2
+    dest: /etc/apache2/mods-enabled/dir.conf
+
+
+- name: UFW Allow Apache2
+  ufw:
+    rule: allow
+    port: 80
+  notify:
+    - Reload Apache

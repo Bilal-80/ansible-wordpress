@@ -1,0 +1,41 @@
+---
+- name: Install MYSQL & Dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - mysql-server
+    - mysql-client
+    - python3-mysqldb
+    - libmysqlclient-dev
+
+
+- name: Start MYSQL Service
+  service:
+    name: mysql
+    state: started 
+
+
+- name: Creating MYSQL User (Wordpress)
+  mysql_user:
+    name: "{{sql_user}}"
+    password: "{{sql_pass}}"
+    priv: '*.*:ALL'
+    host: '%'
+    state: present
+
+
+- name: Creating wordpress_db
+  mysql_db:
+    name: "{{sql_name}}"
+    state: present
+
+
+- name: Enable remote login to mysql
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+    backup: yes 
+  notify:
+    - Restart Mysql
