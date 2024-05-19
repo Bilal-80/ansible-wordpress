@@ -1,0 +1,120 @@
+---
+- name: Install Apache2
+  hosts: demo
+  become: yes
+  vars:
+    sql_name: wordpress
+    sql_user: admin
+    sql_pass: admin
+    wordpress_url: "http://wordpress.org/latest.tar.gz"
+    wordpress_path: "/var/www/html/"
+
+  tasks:
+    - name: Install Apache2, Mysql & Dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop: 
+        - apache2
+        - mysql-server
+        - mysql-client
+        - python3-mysqldb
+        - libmysqlclient-dev
+        - php
+        - libapache2-mod-php
+        - php-mysql
+
+    - name: Start Apache2
+      service:
+        name: apache2
+        state: started
+
+    - name: Start  Mysql Service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Creating Mysql User (wordpress)
+      mysql_user:
+        name: "{{sql_user}}"
+        password: "{{sql_pass}}"
+        priv: '*.*:ALL'
+        host: '%'
+        state: present
+
+    - name: Creating wordpress_db
+      mysql_db:
+        name: "{{sql_name}}"
+        state: present
+
+    - name: Enable remote login to mysql
+      lineinfile:
+         path: /etc/mysql/mysql.conf.d/mysqld.cnf
+         regexp: '^bind-address'
+         line: 'bind-address = 0.0.0.0'
+         backup: yes
+    - name: Delete dir.conf
+      file:
+        path: /etc/apache2/mods-enabled/dir.conf
+        state: absent 
+
+
+    - name: Write file
+      template:
+        src: dir.conf.j2
+        dest: /etc/apache2/mods-enabled/dir.conf
+    - name: ufw allow apache
+      ufw:
+        rule: allow
+        port: 80
+    - name: Extract WordPress
+      unarchive:
+        src:  "{{ wordpress_url }}"
+        dest: "{{ wordpress_path }}"
+        remote_src: yes
+        creates: "{{ wordpress_path }}*/index.php"
+
+    - name: Move files to new location
+      copy:
+        src: "/var/www/html/wordpress/"
+        dest: "/var/www/html/"
+        remote_src: yes
+
+    - name: Set ownership and permissions for WordPress directory
+      file:
+        path: "{{ wordpress_path }}"
+        state: directory
+        owner: www-data 
+        group: www-data  
+        mode: "0755" 
+    - name: Configure WordPress wp-config.php
+      template:
+        src: wp-config.php.j2
+        dest: /var/www/html/wp-config.php
+
+    - name: Ensure WordPress config file has correct permissions
+      file:
+        path: "{{ wordpress_path }}/wp-config.php"
+        owner: www-data  # Adjust to match your web server user
+        group: www-data  # Adjust to match your web server group
+        mode: "0644"
+
+    - name: Enable WordPress site
+      apache2_module:
+        state: present
+        name: rewrite
+      notify:
+        - Reload Apache
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Restart mysql
+      service:
+        name: mysql
+        state: restarted

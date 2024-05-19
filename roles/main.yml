@@ -1,0 +1,8 @@
+---
+- name: Deploy Wordpress On LAMP Stack
+  hosts: demo
+  become: true
+  roles:
+     - apache2
+     - mysql
+     - wordpress
