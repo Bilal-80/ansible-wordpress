@@ -50,8 +50,8 @@ Before you begin, ensure you have met the following requirements:
  ## Configure the inventory:
   Update the *hosts* file with your server details.
   ```bash
-[web]
-your_server_ip ansible_user=your_user
+[demo]
+node_ip
 ```
 # Usage
 ## Run the playbook:
