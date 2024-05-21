@@ -44,7 +44,7 @@ Before you begin, ensure you have met the following requirements:
 ## Clone the repository:
   ```bash
  git clone https://github.com/Bilal80/wordpress-lamp-ansible.git
-  cd wordpress-lamp-ansible
+  cd ansible-wordpress
 ```
 
  ## Configure the inventory:
@@ -58,6 +58,10 @@ node_private_ip
 Execute the Ansible playbook to deploy the WordPress blog.
   ```bash
 ansible-playbook -i hosts playbook.yml
+```
+Using Ansible Role to deploy the WordPress blog.
+  ```bash
+ansible-playbook main.yml
 ```
 ## Access your blog:
 Once the playbook completes, open your web browser and navigate to your server's IP address to complete the WordPress setup through the web interface.
