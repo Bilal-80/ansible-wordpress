@@ -69,5 +69,5 @@ Once the playbook completes, open your web browser and navigate to your server's
 Feel free to customize the Ansible roles and tasks according to your needs. Here are some common customizations:
 - **Apache Configuration:** Edit **`roles/apache/tasks/main.yml`** to customize Apache settings.
 - **PHP Configuration:** Modify **`roles/php/tasks/main.yml`** for PHP-specific configurations.
-- **MySQL Configuration:** Adjust database settings in **`roles/mysql/tasks/main.yml.`**
+- **MySQL Configuration:** Adjust database settings in **`roles/mysql/tasks/main.yml`**
 
