@@ -51,7 +51,7 @@ Before you begin, ensure you have met the following requirements:
   Update the *hosts* file with your server details.
   ```bash
 [demo]
-node_ip
+node_private_ip
 ```
 # Usage
 ## Run the playbook:
